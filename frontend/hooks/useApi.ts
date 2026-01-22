@@ -29,6 +29,15 @@ export interface Project {
     aiSummary?: string;
 }
 
+export interface Hero {
+    greeting: string;
+    headline: string;
+    highlightWord: string;
+    description: string;
+    ctaText: string;
+    ctaLink: string;
+}
+
 // Keys for caching
 export const QUERY_KEYS = {
     roles: 'roles',
@@ -103,10 +112,10 @@ export const useProjects = () => {
 };
 
 export const useHero = () => {
-    return useQuery({
+    return useQuery<Hero>({
         queryKey: [QUERY_KEYS.hero],
         queryFn: async () => {
-            const { data } = await api.get('/hero');
+            const { data } = await api.get<Hero>('/hero');
             return data;
         },
         staleTime: 1000 * 60 * 60, // 1 hour
