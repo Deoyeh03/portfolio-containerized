@@ -106,12 +106,12 @@ export default function Projects() {
                                     className="group cursor-pointer bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500"
                                 >
                                     {/* Card Content - Live Preview or Image */}
-                                    <div className="relative aspect-video w-full overflow-hidden bg-black/40">
+                                    <div className="relative aspect-video w-full overflow-hidden bg-[#0A0A0A]">
                                         {project.liveUrl ? (
                                             <div className="absolute inset-0 z-0">
                                                 <iframe 
                                                     src={project.liveUrl} 
-                                                    className="w-[200%] h-[200%] scale-50 origin-top-left pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-700"
+                                                    className="w-[200%] h-[200%] scale-50 origin-top-left pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity duration-700 blur-[1px] group-hover:blur-0"
                                                     tabIndex={-1}
                                                     loading="lazy"
                                                 />
@@ -132,12 +132,49 @@ export default function Projects() {
                                                 className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
                                             />
                                         ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center text-white/10 text-6xl font-black italic select-none group-hover:text-primary/20 transition-colors">
-                                                {project.title.substring(0, 2)}
+                                            // Fallback: Terminal / System Preview (for backend projects without visual link)
+                                            <div className="absolute inset-0 p-6 flex flex-col justify-between font-mono text-xs bg-[#0F0F0F] select-none overflow-hidden">
+                                                {/* Terminal Header */}
+                                                <div className="flex gap-1.5 mb-2 opacity-50">
+                                                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+                                                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+                                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+                                                </div>
+                                                
+                                                {/* Code/Logs */}
+                                                <div className="space-y-1 text-muted-foreground opacity-60 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex gap-2">
+                                                        <span className="text-blue-500">➜</span>
+                                                        <span className="text-purple-500">~/{project.slug}</span>
+                                                        <span className="text-white">npm run deploy</span>
+                                                    </div>
+                                                    <div className="pl-4 border-l border-white/10 mt-2 space-y-0.5 text-[10px]">
+                                                        <div className="text-green-500/80">✔ Building backend microservices...</div>
+                                                        <div>• Optimizing Docker containers</div>
+                                                        <div>• Verifying MongoDB schema</div>
+                                                        <div className="text-green-500/80">✔ Deployment successful</div>
+                                                        <div className="animate-pulse text-primary mt-1">
+                                                            &gt; Server listening on port 5000...
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Mini Visualization (Abstract Graph) */}
+                                                <div className="absolute bottom-0 right-0 w-32 h-20 opacity-20 group-hover:opacity-40 transition-opacity">
+                                                    <div className="flex items-end justify-end gap-0.5 h-full px-4 pb-4">
+                                                        {[60, 40, 75, 50, 90, 30, 80, 55, 95, 45].map((h, i) => (
+                                                            <div 
+                                                                key={i} 
+                                                                className="w-1.5 bg-primary rounded-t-sm" 
+                                                                style={{ height: `${h}%` }}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                         
-                                        {/* Overlay Gradient */}
+                                        {/* Overlay Gradient (Consistent across all types) */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 pointer-events-none" />
                                         
                                         <div className="absolute bottom-6 left-6 z-20 pointer-events-none">
