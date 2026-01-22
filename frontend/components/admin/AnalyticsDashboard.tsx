@@ -14,8 +14,11 @@ export default function AnalyticsDashboard() {
             try {
                 const res = await api.get('/analytics/stats'); 
                 setData(res.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error fetching stats", error);
+                if (error.response?.status === 401) {
+                    window.location.href = '/admin/login';
+                }
             } finally {
                 setLoading(false);
             }
@@ -37,7 +40,7 @@ export default function AnalyticsDashboard() {
             </div>
 
             <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                     <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <defs>
                             <linearGradient id="colorVisit" x1="0" y1="0" x2="0" y2="1">

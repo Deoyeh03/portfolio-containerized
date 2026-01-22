@@ -53,9 +53,12 @@ export default function ProjectManager() {
             const res = await api.get("/projects"); 
             setProjects(res.data);
             setLoading(false);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error fetching projects", error);
             setLoading(false);
+            if (error.response?.status === 401) {
+                window.location.href = '/admin/login';
+            }
         }
     };
 

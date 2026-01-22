@@ -66,7 +66,14 @@ export default function AdminDashboard() {
                     <StatCard title="Active Projects" value={stats?.projects ?? '-'} />
                     <StatCard title="Total Visits" value={stats?.visits ?? '-'} />
                     <StatCard title="AI Interactions" value={stats?.aiInteractions ?? '-'} />
-                    <StatCard title="System Status" value={typeof stats?.systemStatus === 'object' ? `${stats.systemStatus.database} | ${stats.systemStatus.ai}` : stats?.systemStatus ?? 'Checking...'} />
+                    <StatCard 
+                        title="System Status" 
+                        value={
+                            stats?.systemStatus && typeof stats.systemStatus === 'object' && 'database' in stats.systemStatus
+                            ? `${(stats.systemStatus as any).database} | ${(stats.systemStatus as any).ai}`
+                            : (typeof stats?.systemStatus === 'string' ? stats.systemStatus : 'Checking...')
+                        } 
+                    />
                 </div>
 
                 {/* Project Management */}
