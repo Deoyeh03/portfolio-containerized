@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from 'next/dynamic';
 import Image from "next/image";
-import { Github, Globe, Loader2 } from "lucide-react";
+import { Github, Globe, Loader2, Terminal, Layers } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 import Modal from "../ui/Modal";
 import { useProjects, Project } from "@/hooks/useApi"; // Import hook
 import { useAnalytics } from "@/hooks/useAnalytics";
@@ -259,47 +260,73 @@ export default function Projects() {
                             </div>
                         </div>
 
-                        {/* Technical Deep Dive */}
-                        <div>
-                            <h3 className="text-lg font-bold text-white mb-6">Technical Deep Dive</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {/* Feature Card 1 - Clean Architecture */}
-                                <div className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-primary/30 transition-colors">
-                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                        </svg>
+                        {/* Details / About Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pt-8 border-t border-white/10">
+                            {/* Main Content (Markdown) */}
+                            <div className="md:col-span-8 space-y-10">
+                                <div>
+                                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                                        <div className="w-1.5 h-6 bg-primary rounded-full" />
+                                        About the Project
+                                    </h3>
+                                    <div className="prose prose-invert max-w-none prose-p:text-muted-foreground prose-p:leading-relaxed prose-headings:text-white prose-strong:text-primary prose-a:text-primary hover:prose-a:underline">
+                                        <ReactMarkdown>{selectedProject.fullDescription}</ReactMarkdown>
                                     </div>
-                                    <h4 className="text-white font-bold mb-2">Clean Architecture</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Separation of concerns using MVC/Service pattern on the backend ensures scalability.
-                                    </p>
                                 </div>
 
-                                {/* Feature Card 2 - Security */}
-                                <div className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-primary/30 transition-colors">
-                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
+                                {selectedProject.architecture && (
+                                    <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+                                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                            <Layers className="w-5 h-5 text-primary" /> Architecture & Data Flow
+                                        </h4>
+                                        <div className="prose prose-invert max-w-none text-sm text-muted-foreground">
+                                            <ReactMarkdown>{selectedProject.architecture}</ReactMarkdown>
+                                        </div>
                                     </div>
-                                    <h4 className="text-white font-bold mb-2">RBAC Security</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Custom middleware implementing Role-Based Access Control protecting granular API endpoints.
-                                    </p>
+                                )}
+
+                                {selectedProject.challenges && (
+                                    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-8">
+                                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                            <Terminal className="w-5 h-5 text-primary" /> Engineering Challenges
+                                        </h4>
+                                        <p className="text-muted-foreground text-sm leading-relaxed italic">
+                                            &ldquo;{selectedProject.challenges}&rdquo;
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Sidebar Info */}
+                            <div className="md:col-span-4 space-y-8">
+                                {/* Key Stats / Meta */}
+                                <div className="space-y-4">
+                                    <h4 className="text-xs font-mono text-primary tracking-widest uppercase mb-4">Project Meta</h4>
+                                    <div className="space-y-4">
+                                        <div className="flex flex-col gap-1 p-3 bg-white/5 rounded-lg border border-white/10">
+                                            <span className="text-[10px] uppercase text-muted-foreground font-mono">Category</span>
+                                            <span className="text-white font-medium">{selectedProject.category}</span>
+                                        </div>
+                                        <div className="flex flex-col gap-1 p-3 bg-white/5 rounded-lg border border-white/10">
+                                            <span className="text-[10px] uppercase text-muted-foreground font-mono">Status</span>
+                                            <span className="text-green-500 font-bold flex items-center gap-1.5">
+                                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                                Live & Active
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Feature Card 3 - Real-Time */}
-                                <div className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-primary/30 transition-colors">
-                                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                                        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
+                                {/* Tech Legend */}
+                                <div>
+                                    <h4 className="text-xs font-mono text-primary tracking-widest uppercase mb-4">Skillset Used</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedProject.techStack.map(tech => (
+                                            <span key={tech} className="px-3 py-1.5 bg-black/50 text-white border border-white/10 rounded-md text-xs font-medium hover:border-primary/50 transition-colors">
+                                                {tech}
+                                            </span>
+                                        ))}
                                     </div>
-                                    <h4 className="text-white font-bold mb-2">Real-Time Engine</h4>
-                                    <p className="text-muted-foreground text-sm leading-relaxed">
-                                        Socket.io event-driven architecture for instant task updates and chat features.
-                                    </p>
                                 </div>
                             </div>
                         </div>

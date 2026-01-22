@@ -345,13 +345,14 @@ export default function ProjectManager() {
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-mono text-primary uppercase">Full Case Study (Markdown)</label>
+                             <div className="space-y-2">
+                                <label className="text-xs font-mono text-primary uppercase">About / Project Details (Markdown)</label>
                                 <textarea 
                                     name="fullDescription" value={formData.fullDescription} onChange={handleChange} required
-                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-primary h-40 transition-all"
-                                    placeholder="Detailed project breakdown..."
+                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-primary h-40 transition-all text-sm"
+                                    placeholder="Detailed project breakdown, business logic, and purpose..."
                                 />
+                                <p className="text-[10px] text-muted-foreground italic">This is the main 'About' section shown in the project modal.</p>
                             </div>
 
                             <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
