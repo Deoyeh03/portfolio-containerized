@@ -307,12 +307,24 @@ export default function ProjectManager() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-mono text-primary uppercase">Screenshot URL</label>
-                                <input 
-                                    name="screenshot" value={formData.screenshot} onChange={handleChange}
-                                    className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-primary transition-all"
-                                    placeholder="https://example.com/screenshot.png"
-                                />
+                                <label className="text-xs font-mono text-primary uppercase flex items-center gap-2">
+                                    <Globe size={12} /> Project Card Image (Screenshot URL)
+                                </label>
+                                <div className="flex gap-4 items-start">
+                                    <div className="flex-1 space-y-2">
+                                        <input 
+                                            name="screenshot" value={formData.screenshot} onChange={handleChange}
+                                            className="w-full bg-black/50 border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-primary transition-all text-sm"
+                                            placeholder="https://example.com/screenshot.png"
+                                        />
+                                        <p className="text-[10px] text-muted-foreground italic">Tip: Use a high-quality 16:9 image showing the Hero section.</p>
+                                    </div>
+                                    {formData.screenshot && (
+                                        <div className="relative w-24 aspect-video rounded-lg border border-white/10 overflow-hidden bg-white/5 flex-shrink-0">
+                                            <img src={formData.screenshot} alt="Preview" className="object-cover w-full h-full" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="space-y-2">

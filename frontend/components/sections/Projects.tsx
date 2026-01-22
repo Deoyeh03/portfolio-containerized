@@ -105,9 +105,20 @@ export default function Projects() {
                                     onClick={() => handleOpenModal(project)}
                                     className="group cursor-pointer bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-500"
                                 >
-                                    {/* Card Content - Live Preview or Image */}
+                                    {/* Card Content - Website Preview / Screenshot */}
                                     <div className="relative aspect-video w-full overflow-hidden bg-[#0A0A0A]">
-                                        {project.liveUrl ? (
+                                        {project.screenshot ? (
+                                            <div className="absolute inset-0 z-0">
+                                                <Image 
+                                                    src={project.screenshot} 
+                                                    alt={project.title} 
+                                                    fill 
+                                                    className="object-cover group-hover:scale-110 transition-transform duration-1000 opacity-90 group-hover:opacity-100" 
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60" />
+                                            </div>
+                                        ) : project.liveUrl ? (
                                             <div className="absolute inset-0 z-0">
                                                 <iframe 
                                                     src={project.liveUrl} 
@@ -117,20 +128,6 @@ export default function Projects() {
                                                 />
                                                 <div className="absolute inset-0 bg-transparent group-hover:bg-black/10 transition-colors pointer-events-auto" />
                                             </div>
-                                        ) : project.screenshot ? (
-                                            <Image 
-                                                src={project.screenshot} 
-                                                alt={project.title} 
-                                                fill 
-                                                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
-                                            />
-                                        ) : project.media && project.media.length > 0 ? (
-                                            <Image 
-                                                src={project.media[0]} 
-                                                alt={project.title} 
-                                                fill 
-                                                className="object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
-                                            />
                                         ) : (
                                             // Fallback: Terminal / System Preview (for backend projects without visual link)
                                             <div className="absolute inset-0 p-6 flex flex-col justify-between font-mono text-xs bg-[#0F0F0F] select-none overflow-hidden">
@@ -175,7 +172,7 @@ export default function Projects() {
                                         )}
                                         
                                         {/* Overlay Gradient (Consistent across all types) */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10 pointer-events-none" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent z-10 pointer-events-none" />
                                         
                                         <div className="absolute bottom-6 left-6 z-20 pointer-events-none">
                                             <div className="text-primary font-mono text-xs mb-2 px-2 py-1 bg-black/50 backdrop-blur-md rounded border border-white/10 w-fit flex items-center gap-1">
