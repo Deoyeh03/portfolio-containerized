@@ -3,16 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Mail, Linkedin, Github, MessageSquare, Download, Loader2 } from "lucide-react";
-import { useResume } from "@/hooks/useApi";
-
-interface Experience {
-    _id: string;
-    company: string;
-    role: string;
-    duration: string;
-    achievements: string[];
-    techUsed: string[];
-}
+import { useResume, Experience } from "@/hooks/useApi";
 
 export default function Resume() {
     const { data: experiences = [], isLoading: loading } = useResume();

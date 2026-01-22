@@ -13,8 +13,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 const Swiper = dynamic(() => import('swiper/react').then(mod => mod.Swiper), { ssr: false });
 const SwiperSlide = dynamic(() => import('swiper/react').then(mod => mod.SwiperSlide), { ssr: false });
 
-// Dynamically import motion to avoid hydration issues
-const motion = dynamic(() => import('framer-motion').then(mod => mod.motion), { ssr: false });
+import { motion } from 'framer-motion';
 
 import { Navigation, Pagination, EffectCoverflow, Mousewheel } from 'swiper/modules';
 import 'swiper/css';

@@ -1,21 +1,12 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { Code2, Braces, Rocket, Cpu, Terminal, Layers, Globe, Zap, Database, Cloud, Shield, Layout, PenTool, Lightbulb } from "lucide-react";
+import { useRef } from "react";
+import { Braces, Rocket, Layers, Code2, Cloud, Shield, Database, Layout, PenTool, Lightbulb } from "lucide-react";
 import TiltCard from "../ui/TiltCard";
 import { useJourney } from "@/hooks/useApi";
 
-interface JourneyPoint {
-    _id: string;
-    title: string;
-    year: string;
-    description: string;
-    type: string;
-}
-
 export default function TechJourney() {
-    const { data: journeyPoints = [], isLoading: loading } = useJourney();
+    const { data: journeyPoints = [] } = useJourney();
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Icon map remains the same but used dynamically

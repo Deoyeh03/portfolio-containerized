@@ -38,6 +38,33 @@ export interface Hero {
     ctaLink: string;
 }
 
+export interface Experience {
+    _id: string;
+    company: string;
+    role: string;
+    duration: string;
+    achievements: string[];
+    techUsed: string[];
+}
+
+export interface Skill {
+    _id: string;
+    name: string;
+    category: string;
+    proficiency: number;
+    summary: string;
+    icon?: string;
+}
+
+export interface JourneyPoint {
+    _id: string;
+    title: string;
+    year: string;
+    description: string;
+    type: string;
+    icon?: string;
+}
+
 // Keys for caching
 export const QUERY_KEYS = {
     roles: 'roles',
@@ -51,7 +78,7 @@ export const QUERY_KEYS = {
 
 // Hooks
 export const useRoles = () => {
-    return useQuery({
+    return useQuery<Role[]>({
         queryKey: [QUERY_KEYS.roles],
         queryFn: async () => {
             const { data } = await api.get<Role[]>('/roles');
@@ -62,10 +89,10 @@ export const useRoles = () => {
 };
 
 export const useJourney = () => {
-    return useQuery({
+    return useQuery<JourneyPoint[]>({
         queryKey: [QUERY_KEYS.journey],
         queryFn: async () => {
-            const { data } = await api.get('/journey');
+            const { data } = await api.get<JourneyPoint[]>('/journey');
             return data;
         },
         staleTime: 1000 * 60 * 60 * 24, // 24 hours
@@ -73,10 +100,10 @@ export const useJourney = () => {
 };
 
 export const useSkills = () => {
-    return useQuery({
+    return useQuery<Skill[]>({
         queryKey: [QUERY_KEYS.skills],
         queryFn: async () => {
-            const { data } = await api.get('/skills');
+            const { data } = await api.get<Skill[]>('/skills');
             return data;
         },
         staleTime: 1000 * 60 * 60 * 24, // 24 hours
@@ -84,10 +111,10 @@ export const useSkills = () => {
 };
 
 export const useResume = () => {
-    return useQuery({
+    return useQuery<Experience[]>({
         queryKey: [QUERY_KEYS.resume],
         queryFn: async () => {
-            const { data } = await api.get('/resume');
+            const { data } = await api.get<Experience[]>('/resume');
             return data;
         },
         staleTime: 1000 * 60 * 60 * 24, // 24 hours
@@ -99,7 +126,7 @@ export const useProjects = () => {
         queryKey: [QUERY_KEYS.projects],
         queryFn: async () => {
             try {
-                const { data } = await api.get('/projects');
+                const { data } = await api.get<Project[]>('/projects');
                 return data;
             } catch (error) {
                 console.error('Error fetching projects:', error);
