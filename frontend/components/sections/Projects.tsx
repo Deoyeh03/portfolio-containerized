@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from 'next/dynamic';
 import Image from "next/image";
 import { Github, Globe, Loader2, Terminal, Layers } from "lucide-react";
@@ -9,10 +9,7 @@ import Modal from "../ui/Modal";
 import { useProjects, Project } from "@/hooks/useApi"; // Import hook
 import { useAnalytics } from "@/hooks/useAnalytics";
 
-// Dynamically import Swiper to avoid SSR issues
-const Swiper = dynamic(() => import('swiper/react').then(mod => mod.Swiper), { ssr: false });
-const SwiperSlide = dynamic(() => import('swiper/react').then(mod => mod.SwiperSlide), { ssr: false });
-
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { motion } from 'framer-motion';
 
 import { Navigation, Pagination, EffectCoverflow, Mousewheel } from 'swiper/modules';
@@ -29,8 +26,11 @@ export default function Projects() {
     const projects: Project[] = projectsQuery.data || [];
     const isLoading = projectsQuery.isLoading;
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
-    // useEffect removed
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
 
     const { trackEvent } = useAnalytics();
@@ -40,10 +40,10 @@ export default function Projects() {
         trackEvent("project_view", { projectId: project._id, title: project.title });
     };
 
-    if (isLoading) {
+    if (isLoading || !isMounted) {
         return (
-            <div className="py-32 flex justify-center items-center">
-                <Loader2 className="animate-spin text-primary w-8 h-8" />
+            <div className="py-32 flex justify-center items-center h-[500px]">
+                <Loader2 className="animate-spin text-primary w-10 h-10" />
             </div>
         );
     }
