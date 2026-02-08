@@ -17,6 +17,9 @@ dotenv.config();
 
 const app: Application = express();
 
+// Trust Proxy (for Heroku, Render, Docker, Nginx) - Fixes X-Forwarded-For warning
+app.set('trust proxy', 1);
+
 // Security Headers - Enhanced Helmet Configuration
 app.use(helmet({
     contentSecurityPolicy: {
@@ -140,6 +143,8 @@ import githubRoutes from './modules/github/github.routes';
 import heroRoutes from './modules/hero/hero.routes';
 import roleRoutes from './modules/roles/role.routes';
 import settingsRoutes from './modules/settings/settings.routes';
+import invoiceRoutes from './modules/invoices/invoice.routes';
+import contractRoutes from './modules/contracts/contract.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 // Mount Routes with Rate Limiting
@@ -154,6 +159,8 @@ app.use('/api/journey', apiLimiter, journeyRoutes);
 app.use('/api/hero', apiLimiter, heroRoutes);
 app.use('/api/roles', apiLimiter, roleRoutes);
 app.use('/api/settings', apiLimiter, settingsRoutes);
+app.use('/api/invoices', apiLimiter, invoiceRoutes);
+app.use('/api/contracts', apiLimiter, contractRoutes);
 app.use('/api/webhooks', githubRoutes); // No rate limit for webhooks
 
 // Error Handler (must be last)

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, X, Send, Sparkles, Loader2 } from "lucide-react";
 import api from "@/lib/api";
-import { useEffect } from "react";
 
 interface Message {
     role: "user" | "ai";
@@ -16,13 +15,19 @@ export default function AIChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { role: "ai", content: "Hello! I'm the AI assistant for this portfolio. I can explain the architecture behind the projects or summarize development details. What would you like to know?" }
+        { role: "ai", content: "Hello! I'm your Personal Assistant for this portfolio. I have deep knowledge of every project, technology, and experience. Ask me anything - I can explain architecture, challenges, tech choices, or any aspect of the work!" }
     ]);
     const [input, setInput] = useState("");
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Auto-scroll to bottom when messages update
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -122,6 +127,7 @@ export default function AIChatWidget() {
                                     </div>
                                 </div>
                             ))}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         {/* Input */}

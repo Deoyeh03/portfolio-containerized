@@ -1,50 +1,32 @@
 import logger from '../../utils/logger';
 import { buildKnowledgeBase, getProjectContext } from './knowledge.service';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import OpenAI from 'openai';
+import Groq from 'groq-sdk';
 
 // Lazy initialization to avoid hoisting issues
-let geminiModel: any = null;
-let openaiClient: OpenAI | null = null;
+let groqClient: Groq | null = null;
 
-const getGeminiModel = () => {
-    if (geminiModel) return geminiModel;
-    
-    const key = process.env.GOOGLE_AI_KEY;
-    if (!key || key.includes('mock') || key === 'your_google_ai_key_here') {
+const getGroqClient = () => {
+    if (groqClient) return groqClient;
+
+    const key = process.env.GROQ_API_KEY;
+    if (!key || key.includes('mock') || key === 'your_groq_api_key_here') {
+        logger.warn('Groq API key not configured or invalid');
         return null;
     }
 
     try {
-        const genAI = new GoogleGenerativeAI(key);
-        geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
-        return geminiModel;
+        groqClient = new Groq({ apiKey: key });
+        logger.info('Groq client initialized successfully');
+        return groqClient;
     } catch (error) {
-        logger.error('Failed to initialize Gemini Model', error);
-        return null;
-    }
-};
-
-const getOpenAIClient = () => {
-    if (openaiClient) return openaiClient;
-
-    const key = process.env.OPENAI_API_KEY;
-    if (!key || key.includes('mock') || key === 'your_openai_api_key_here') {
-        return null;
-    }
-
-    try {
-        openaiClient = new OpenAI({ apiKey: key });
-        return openaiClient;
-    } catch (error) {
-        logger.error('Failed to initialize OpenAI Client', error);
+        logger.error('Failed to initialize Groq Client', error);
         return null;
     }
 };
 
 export const generateResponse = async (context: string, question: string, projectId?: string): Promise<string> => {
     
-    // Build knowledge base (shared for both)
+    // Build knowledge base
     const knowledgeBase = await buildKnowledgeBase();
     let projectContext = '';
     if (projectId) {
@@ -52,59 +34,83 @@ export const generateResponse = async (context: string, question: string, projec
     }
 
     const systemPrompt = `
-    You are an AI assistant representing a senior full-stack engineer. 
-    You have direct access to their professional database.
-
-    PROFILE CONTEXT:
+    You are representing a senior full-stack engineer in a casual, friendly conversation about their work.
+    Think of yourself as the engineer themselves, chatting naturally with someone interested in their projects.
+    
+    TONE & STYLE:
+    - Casual and conversational, like talking to a friend or colleague
+    - Use natural language - say "Hey!" or "Hi there!" instead of formal greetings
+    - Avoid bullet points, formal structures, or resume-style lists
+    - Write in flowing paragraphs like you're telling a story
+    - Use contractions (I'm, I've, we're) to sound more natural
+    - Show personality - be enthusiastic, humble, and genuine
+    
+    RESPONSE APPROACH:
+    
+    For greetings like "hi" or "hello":
+    - Respond warmly and casually: "Hey! Good to see you here. I'm always excited to chat about my work. What caught your interest?"
+    - Keep it brief and friendly, don't dump information
+    
+    For specific project questions:
+    - Tell the story naturally: "Oh, that project was really interesting! So basically, I was trying to..."
+    - Explain the why before the what: "I built this because..."
+    - Mention challenges casually: "The tricky part was..."
+    - Use real examples: "For instance, when I was working on X, I used Y to solve Z"
+    
+    For technology questions:
+    - Explain in context: "I use Node.js pretty heavily across my projects. For example, in the Groq integration..."
+    - Share your reasoning: "I chose MongoDB because..."
+    - Be honest about your experience level without being formal
+    
+    For general questions:
+    - Answer like you're having a coffee chat
+    - Share insights and lessons learned
+    - Reference specific work naturally in the conversation
+    
+    CRITICAL RULES:
+    - NEVER use bullet points or formal lists
+    - NEVER sound like a resume or LinkedIn profile
+    - NEVER be overly formal or robotic
+    - DO sound like a real person having a conversation
+    - DO vary your sentence length and structure
+    - DO show enthusiasm and personality
+    - DO keep responses concise unless asked for details
+    
+    CONTEXT ABOUT THE PORTFOLIO:
     ${knowledgeBase.summary}
 
-    ${projectContext ? `CURRENT PROJECT CONTEXT:\n${projectContext}\n` : ''}
-
-    INSTRUCTIONS:
-    1. Answer in the first person ("I").
-    2. Be concise, professional, and technically accurate.
-    3. Only reference facts provided in the PROFILE CONTEXT.
-    4. If the answer isn't in the context, say you don't have that specific info but mention your general expertise.
+    ${projectContext ? `\n=== Currently Discussing ===\n${projectContext}\n` : ''}
+    
+    Remember: You're a person, not a chatbot. Sound natural, be yourself, and keep it conversational!
     `;
 
-    // 1. Try Gemini First
-    try {
-        const model = getGeminiModel();
-        if (model) {
-            const prompt = `${systemPrompt}\n\nUSER QUESTION: "${context || question}"`;
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            return response.text();
-        }
-    } catch (error) {
-        logger.warn('Gemini Generation Failed. Attempting Failover to OpenAI...', error);
-    }
 
-    // 2. Fallback to OpenAI
+    // Use Groq for AI generation
     try {
-        const openai = getOpenAIClient();
-        if (openai) {
-            logger.info('Using OpenAI Fallback');
-            const completion = await openai.chat.completions.create({
+        const groq = getGroqClient();
+        if (groq) {
+            logger.info('Using Groq AI for response generation');
+            const completion = await groq.chat.completions.create({
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: context || question }
                 ],
-                model: "gpt-3.5-turbo",
+                model: "llama-3.3-70b-versatile", // Fast and capable model
+                temperature: 0.7,
+                max_tokens: 1024,
             });
-            return completion.choices[0].message.content || "No response generated.";
+            return completion.choices[0]?.message?.content || "No response generated.";
         }
     } catch (error) {
-        logger.error('OpenAI Generation Failed', error);
+        logger.error('Groq AI Generation Failed', error);
     }
 
-    // 3. Final Mock Fallback
-    logger.warn('All AI Providers failed or keys missing. Returning Mock Response.');
-    return `[MOCK RESPONSE] Hello! I see you're asking about "${question}". Currently, both Gemini and OpenAI services are unavailable (or keys are invalid). Please check your server logs and .env configuration.`;
+    // Fallback response if Groq is unavailable
+    logger.warn('Groq AI unavailable or key missing. Returning fallback response.');
+    return `[MOCK RESPONSE] Hello! I see you're asking about "${question}". Currently, the AI service is unavailable. Please check your server logs and ensure GROQ_API_KEY is configured in your .env file.`;
 };
 
 export const parseReadmeToProject = async (readmeContent: string, repoName: string): Promise<any> => {
-    // Shared Prompt
     const promptText = `
     Act as a Technical Documentation Expert. Analyze this README content and extract structured data for a portfolio project case study.
     
@@ -126,37 +132,25 @@ export const parseReadmeToProject = async (readmeContent: string, repoName: stri
     `;
 
     try {
-        // Try Gemini
-        const model = getGeminiModel();
-        if (model) {
-            const result = await model.generateContent(promptText);
-            const response = await result.response;
-            const text = response.text();
-            const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(jsonString);
-        }
-        
-    } catch (error) {
-        logger.warn('Gemini README Parsing failed', error);
-    }
-
-    try {
-        // Try OpenAI
-        const openai = getOpenAIClient();
-        if (openai) {
-            const completion = await openai.chat.completions.create({
+        const groq = getGroqClient();
+        if (groq) {
+            logger.info('Using Groq AI for README parsing');
+            const completion = await groq.chat.completions.create({
                 messages: [{ role: "user", content: promptText }],
-                model: "gpt-3.5-turbo",
+                model: "llama-3.3-70b-versatile",
+                temperature: 0.3, // Lower temperature for more consistent JSON output
+                max_tokens: 2048,
             });
-            const text = completion.choices[0].message.content || "{}";
+            const text = completion.choices[0]?.message?.content || "{}";
             const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(jsonString);
         }
     } catch (error) {
-         logger.warn('OpenAI README Parsing failed', error);
+         logger.warn('Groq README Parsing failed', error);
     }
 
     // Fallback Manual Extraction
+    logger.info('Using fallback manual extraction for README parsing');
     return {
         title: repoName.charAt(0).toUpperCase() + repoName.slice(1).replace(/-/g, ' '),
         summary: "Project synced from GitHub (AI Extraction Unavailable).",

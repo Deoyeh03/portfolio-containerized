@@ -66,25 +66,67 @@ const generateContextSummary = (projects: any[], experience: any[], skills: any[
         `${exp.role} at ${exp.company} (${exp.duration})`
     ).join('; ');
 
-    const projectSummary = projects.map(p => 
-        `${p.title} (${p.category}): ${p.summary}`
-    ).join('\n');
+    // Enhanced project summary with full details
+    const projectDetails = projects.map(p => {
+        let details = `\n### ${p.title}\n`;
+        details += `**Category**: ${p.category}\n`;
+        details += `**Summary**: ${p.summary}\n`;
+        details += `**Tech Stack**: ${p.techStack.join(', ')}\n`;
+        
+        if (p.fullDescription) {
+            details += `**Description**: ${p.fullDescription}\n`;
+        }
+        
+        if (p.architecture) {
+            details += `**Architecture**: ${p.architecture}\n`;
+        }
+        
+        if (p.challenges) {
+            details += `**Challenges**: ${p.challenges}\n`;
+        }
+        
+        if (p.features && p.features.length > 0) {
+            details += `**Key Features**: ${p.features.join(', ')}\n`;
+        }
+        
+        if (p.liveUrl) {
+            details += `**Live URL**: ${p.liveUrl}\n`;
+        }
+        
+        if (p.githubUrl) {
+            details += `**GitHub**: ${p.githubUrl}\n`;
+        }
+        
+        return details;
+    }).join('\n');
 
     return `
 # Professional Profile
 
-## Experience
+## Personal Information
+I am a senior full-stack engineer with a strong focus on backend development and scalable systems.
+
+## Current Experience
 ${experienceSummary}
 
-## Technical Skills
+## Technical Skills & Proficiencies
 ${Object.entries(skillsByCategory).map(([cat, skills]: [string, any]) => 
-    `${cat}: ${skills.join(', ')}`
+    `**${cat}**: ${skills.join(', ')}`
 ).join('\n')}
 
-## Key Projects
-${projectSummary}
+## Portfolio Projects (Detailed)
+${projectDetails}
 
-## Tech Journey Highlights
-${journey.slice(0, 5).map((j: any) => `${j.year}: ${j.title}`).join('\n')}
+## Technology Journey
+${journey.slice(0, 8).map((j: any) => `**${j.year}**: ${j.title}${j.description ? ' - ' + j.description : ''}`).join('\n')}
+
+## Professional Capabilities
+- Full-stack development with emphasis on backend architecture
+- RESTful API design and implementation
+- Database design and optimization (MongoDB, SQL)
+- Real-time systems with WebSockets
+- AI integration using Groq SDK for high-performance inference
+- DevOps and deployment automation
+- Authentication and security best practices
     `.trim();
 };
